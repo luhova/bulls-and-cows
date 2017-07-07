@@ -10,7 +10,7 @@ defmodule BC.Registry do
   end
 
   def create(server, name, number) do
-    GenServer.cast(server, {:create, name, number})
+    GenServer.call(server, {:create, name, number})
   end
 
   def init(:ok) do
@@ -23,15 +23,15 @@ defmodule BC.Registry do
     {:reply, Map.fetch(names, name), state}
   end
 
-  def handle_cast({:create, name, number}, {names, refs}) do
+  def handle_call({:create, name, number}, _from, {names, refs}) do
     if Map.has_key?(names, name) do
-      {:noreply, {names, refs}}
+      {:reply, {names, refs}, {names, refs}}
     else
       {:ok, pid} = BC.Game.Supervisor.start_game(number)
       ref = Process.monitor(pid)
       refs = Map.put(refs, ref, name)
       names = Map.put(names, name, pid)
-      {:noreply, {names, refs}}
+      {:reply, {names, refs}, {names, refs}}
     end
   end
 
