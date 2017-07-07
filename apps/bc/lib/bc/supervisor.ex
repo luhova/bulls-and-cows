@@ -11,6 +11,6 @@ defmodule BC.Supervisor do
       supervisor(BC.Game.Supervisor, [])
     ]
 
-    supervise(children, strategy: :one_for_one)
+    supervise(children, strategy: :rest_for_one)
   end
 end
